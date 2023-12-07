@@ -9,6 +9,8 @@ import com.dayone.dividend_project.persist.repository.CompanyRepository;
 import com.dayone.dividend_project.persist.repository.DividendRepository;
 import com.dayone.dividend_project.scraper.Scraper;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -29,6 +31,10 @@ public class CompanyService {
             throw new RuntimeException("already exists ticker -> " + ticker);
         }
         return this.storeCompanyAndDividend(ticker);
+    }
+
+    public Page<CompanyEntity> getAllCompany(Pageable pageable){
+        return this.companyRepository.findAll(pageable);
     }
 
     //DB에 저장하지 않은 회사의 경우에만 실행

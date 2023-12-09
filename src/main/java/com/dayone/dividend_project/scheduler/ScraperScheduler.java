@@ -2,6 +2,7 @@ package com.dayone.dividend_project.scheduler;
 
 import com.dayone.dividend_project.model.Company;
 import com.dayone.dividend_project.model.ScrapedResult;
+import com.dayone.dividend_project.model.constants.CacheKey;
 import com.dayone.dividend_project.persist.entity.CompanyEntity;
 import com.dayone.dividend_project.persist.entity.DividendEntity;
 import com.dayone.dividend_project.persist.repository.CompanyRepository;
@@ -9,6 +10,8 @@ import com.dayone.dividend_project.persist.repository.DividendRepository;
 import com.dayone.dividend_project.scraper.Scraper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +19,7 @@ import java.util.List;
 
 @Slf4j
 @Component
+@EnableCaching
 @AllArgsConstructor
 public class ScraperScheduler {
     private final CompanyRepository companyRepository;
@@ -23,9 +27,9 @@ public class ScraperScheduler {
     private final DividendRepository dividendRepository;
 
 
-
-        // 데이터를 주기적으로 스크래핑
-  //  @Scheduled(cron = "${scheduler.scrap.yahoo}")
+    // 데이터를 주기적으로 스크래핑
+    @CacheEvict(value = CacheKey.KEY_FINANCE, allEntries = true)
+    @Scheduled(cron = "${scheduler.scrap.yahoo}")
     public void yahooFinanceScheduling() {
         log.info("==== scraping scheduler is started ====");
 
@@ -34,10 +38,8 @@ public class ScraperScheduler {
         //회사마다 배당금 정보를 새로 스크래핑
         for (var company : companies) {
             log.info("===== scraping scheduler is started ---> " + company.getName());
-            ScrapedResult scrapedResult = this.yahooFinanceScraper.scrap(Company.builder()
-                    .name(company.getName())
-                    .ticker(company.getTicker())
-                    .build());
+            ScrapedResult scrapedResult = this.yahooFinanceScraper.
+                    scrap(new Company(company.getTicker(), company.getName()));
 
             //스크래핑한 대방금 정보 중 데이터베이스에 없는 값은 저장
             scrapedResult.getDividends().stream()

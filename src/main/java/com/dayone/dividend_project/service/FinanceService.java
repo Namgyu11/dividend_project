@@ -3,11 +3,15 @@ package com.dayone.dividend_project.service;
 import com.dayone.dividend_project.model.Company;
 import com.dayone.dividend_project.model.Dividend;
 import com.dayone.dividend_project.model.ScrapedResult;
+import com.dayone.dividend_project.model.constants.CacheKey;
 import com.dayone.dividend_project.persist.entity.CompanyEntity;
 import com.dayone.dividend_project.persist.entity.DividendEntity;
 import com.dayone.dividend_project.persist.repository.CompanyRepository;
 import com.dayone.dividend_project.persist.repository.DividendRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Cache;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class FinanceService {
@@ -22,7 +27,10 @@ public class FinanceService {
     private final CompanyRepository companyRepository;
     private final DividendRepository dividendRepository;
 
+
+    @Cacheable(key = "#companyName", value = CacheKey.KEY_FINANCE)
     public ScrapedResult getDividendByCompanyName(String companyName) {
+        log.info("search company ->" + companyName);
         //1. 회사명을 기준으로 정보를 조회
         CompanyEntity company = this.companyRepository.findByName(companyName)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 회사명입니다."));
@@ -44,17 +52,11 @@ public class FinanceService {
          */
 
         List<Dividend> dividends = dividendEntities.stream()
-                .map(e -> Dividend.builder()
-                        .date(e.getDate())
-                        .dividend(e.getDividend())
-                        .build())
+                .map(e -> new Dividend(e.getDate(), e.getDividend()))
                 .collect(Collectors.toList());
 
 
-        return new ScrapedResult(Company.builder()
-                .ticker(company.getTicker())
-                .name(company.getName())
-                .build(), dividends
-        );
+        return new ScrapedResult(new Company(company.getTicker(), company.getTicker()),
+                dividends);
     }
 }

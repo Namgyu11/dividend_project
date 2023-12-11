@@ -1,6 +1,7 @@
 package com.dayone.dividend_project.service;
 
 
+import com.dayone.dividend_project.exception.impl.NoCompanyException;
 import com.dayone.dividend_project.model.Company;
 import com.dayone.dividend_project.model.ScrapedResult;
 import com.dayone.dividend_project.persist.entity.CompanyEntity;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,6 +89,16 @@ public class CompanyService {
         return companyEntities.stream()
                 .map(e -> e.getName())
                 .collect(Collectors.toList());
+    }
+
+    public String deleteCompany(String ticker) {
+        var company = this.companyRepository.findByTicker(ticker)
+                .orElseThrow(NoCompanyException::new);
+
+        this.dividendRepository.deleteAllByCompanyId(company.getId());
+        this.companyRepository.delete(company);
+        this.deleteAutocompleteKeyword(company.getName());
+        return company.getName();
     }
 
 }

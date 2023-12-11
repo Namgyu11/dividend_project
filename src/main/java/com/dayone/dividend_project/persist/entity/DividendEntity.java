@@ -1,12 +1,12 @@
 package com.dayone.dividend_project.persist.entity;
 
 import com.dayone.dividend_project.model.Dividend;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity(name = "DIVIDEND")

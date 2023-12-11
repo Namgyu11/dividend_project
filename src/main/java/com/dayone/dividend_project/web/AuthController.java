@@ -1,7 +1,6 @@
 package com.dayone.dividend_project.web;
 
 import com.dayone.dividend_project.model.Auth;
-import com.dayone.dividend_project.persist.entity.MemberEntity;
 import com.dayone.dividend_project.security.TokenProvider;
 import com.dayone.dividend_project.service.MemberService;
 import lombok.RequiredArgsConstructor;

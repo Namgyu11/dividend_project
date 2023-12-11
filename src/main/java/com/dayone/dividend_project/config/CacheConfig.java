@@ -1,6 +1,5 @@
 package com.dayone.dividend_project.config;
 
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;

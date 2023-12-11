@@ -1,6 +1,5 @@
 package com.dayone.dividend_project.web;
 
-import com.dayone.dividend_project.model.ScrapedResult;
 import com.dayone.dividend_project.service.FinanceService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
